@@ -1,23 +1,26 @@
 [package]
-authors = ["Jorge Aparicio <jorge@japaric.io>", "Alex M <amcnurlan@gmail.com>"]
+authors = ["Alex M <amcnurlan@gmail.com>"]
 edition = "2018"
-name = "lsm303agr-f3-disco"
-description = "LSM303AGR example for the STM32F3DISCOVERY board"
+name = "sparkfun-oled"
+description = "SparkFun OLED (Qwick) example, uses STM32F103"
 version = "0.1.0"
 
 [dependencies]
 cortex-m = "0.7.7"
 cortex-m-rt = "0.7.3"
 panic-halt = "0.2.0"
-panic-itm = "0.4.0"
-lsm303agr = "1.0.0"
+# panic-itm = "0.4.0"
 embedded-hal = "1.0.0"
-switch-hal = "0.4.0"
-m = "0.1.1"
+nb = "1"
+ssd1306 = { path = "./aux/ssd1306" }
+embedded-graphics = "0.8.1"
 
-[dependencies.stm32f3xx-hal]
+# switch-hal = "0.4.0"
+# m = "0.1.1"
+
+[dependencies.stm32f1xx-hal]
 version = "0.10"
-features = ["rt", "stm32f303xc"] # replace the model of your microcontroller here
+features = ["rt", "stm32f103", "medium"] # replace the model of your microcontroller here
 
 [profile.release]
 codegen-units = 1 # better optimizations
