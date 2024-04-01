@@ -205,16 +205,18 @@ where
         Command::StartLine(0).send(&mut self.interface)?;                   // good
         // TODO: Ability to turn charge pump on/off
         Command::ChargePump(true).send(&mut self.interface)?;               // good 
+        Command::Invert(false).send(&mut self.interface)?;
+        Command::AllOn(false).send(&mut self.interface)?;
+        self.set_rotation(rotation)?;
+        self.size.configure(&mut self.interface)?;                      // modified
+        self.set_brightness(Brightness::default())?;
+
+        Command::VcomhDeselect(VcomhLevel::Auto).send(&mut self.interface)?;
+
+
         Command::AddressMode(mode).send(&mut self.interface)?;              // good with Horizontol
 
-        self.size.configure(&mut self.interface)?;
-        self.set_rotation(rotation)?;
-
-        self.set_brightness(Brightness::default())?;
-        Command::VcomhDeselect(VcomhLevel::Auto).send(&mut self.interface)?;
-        Command::AllOn(false).send(&mut self.interface)?;
-        Command::Invert(false).send(&mut self.interface)?;
-        Command::EnableScroll(false).send(&mut self.interface)?;
+        // Command::EnableScroll(false).send(&mut self.interface)?;
         Command::DisplayOn(true).send(&mut self.interface)?;
 
         self.addr_mode = mode;

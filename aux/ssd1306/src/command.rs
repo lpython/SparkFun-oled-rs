@@ -96,7 +96,8 @@ impl Command {
         DI: WriteOnlyDataCommand,
     {
         match self {
-            Command::Contrast(val) => Self::send_commands(iface, &[0x81, val]),
+            // Command::Contrast(val) => Self::send_commands(iface, &[0x81, val]),
+            Command::Contrast(_val) => Self::send_commands(iface, &[0x81, 0x8F]),
             Command::AllOn(on) => Self::send_commands(iface, &[0xA4 | (on as u8)]),
             Command::Invert(inv) => Self::send_commands(iface, &[0xA6 | (inv as u8)]),
             Command::DisplayOn(on) => Self::send_commands(iface, &[0xAE | (on as u8)]),
@@ -149,8 +150,9 @@ impl Command {
             Command::DisplayClockDiv(fosc, div) => {
                 Self::send_commands(iface, &[0xD5, ((0xF & fosc) << 4) | (0xF & div)])
             }
-            Command::PreChargePeriod(phase1, phase2) => {
-                Self::send_commands(iface, &[0xD9, ((0xF & phase2) << 4) | (0xF & phase1)])
+            Command::PreChargePeriod(_phase1, _phase2) => {
+                // Self::send_commands(iface, &[0xD9, ((0xF & phase2) << 4) | (0xF & phase1)])
+                Self::send_commands(iface, &[0xD9, 0xF1])
             }
             Command::VcomhDeselect(level) => {
                 Self::send_commands(iface, &[0xDB, (level as u8) << 4])
