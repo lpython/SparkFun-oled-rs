@@ -65,7 +65,8 @@ fn main() -> ! {
         .into_buffered_graphics_mode();
     display.init().unwrap();
 
-    display.set_draw_area( (0x20, 0x00), ( 0x20 + 64, 0x06)).unwrap();
+    // let test = (0x20, 0x00);
+    display.set_draw_area( (0x20u8, 0x00u8), ( 0x20u8 + 64, 0x06u8)).unwrap();
     // display.set_column(0).unwrap();
     // display.set_row(0).unwrap();
     display.draw(rust_logo::IMAGE).unwrap();

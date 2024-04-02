@@ -56,6 +56,9 @@ pub enum Command {
     /// Setup page start and end address
     /// This is only for horizontal or vertical addressing mode
     PageAddress(Page, Page),
+    /// Setup page start and end address
+    /// This is only for horizontal or vertical addressing mode
+    PageAddressNum(u8, u8),
     /// Set GDDRAM page start address for Page addressing mode
     PageStart(Page),
     /// Set display start line from 0-63
@@ -136,6 +139,9 @@ impl Command {
             Command::ColumnAddress(start, end) => Self::send_commands(iface, &[0x21, start, end]),
             Command::PageAddress(_start, _end) => {
                 Self::send_commands(iface, &[0x22, 0, 5])
+            }
+            Command::PageAddressNum(start, end) => {
+                Self::send_commands(iface, &[0x22, start, end])
             }
             Command::PageStart(page) => Self::send_commands(iface, &[0xB0 | (page as u8)]),
             Command::StartLine(line) => Self::send_commands(iface, &[0x40 | (0x3F & line)]),

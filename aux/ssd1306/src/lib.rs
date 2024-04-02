@@ -368,7 +368,7 @@ where
         Command::ColumnAddress(start.0, end.0 - 1 ).send(&mut self.interface)?;
 
         if self.addr_mode != AddrMode::Page {
-            Command::PageAddress(start.1.into(), (end.1 - 1).into())
+            Command::PageAddressNum(start.1, end.1 - 1 )
                 .send(&mut self.interface)?;
         }
 
