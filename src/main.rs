@@ -68,10 +68,10 @@ fn main() -> ! {
     display.set_draw_area( (0x20, 0x00), ( 0x20 + 64, 0x06)).unwrap();
     // display.set_column(0).unwrap();
     // display.set_row(0).unwrap();
-    // display.draw(rust_logo::IMAGE).unwrap();
-    display.set_column_2(0).unwrap();
-    display.set_row(0).unwrap();    
-    display.bounded_draw(rust_logo::IMAGE, 64, (0,0), (64, 48)).unwrap();
+    display.draw(rust_logo::IMAGE).unwrap();
+    // display.set_column_2(0).unwrap();
+    // display.set_row(0).unwrap();    
+    // display.bounded_draw(rust_logo::IMAGE, 64, (0,0), (64, 48)).unwrap();
 
     // let raw: ImageRaw<BinaryColor> = ImageRaw::new(rust_logo::IMAGE, 64);
 

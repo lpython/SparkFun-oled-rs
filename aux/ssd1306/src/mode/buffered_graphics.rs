@@ -60,7 +60,7 @@ where
     fn init(&mut self) -> Result<(), DisplayError> {
         self.clear_impl(false);
         // self.init_with_addr_mode(AddrMode::Horizontal)
-        self.init_with_addr_mode(AddrMode::Page)
+        self.init_with_addr_mode(AddrMode::Horizontal)
     }
 }
 

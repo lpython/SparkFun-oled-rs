@@ -134,8 +134,8 @@ impl Command {
             }
             Command::AddressMode(mode) => Self::send_commands(iface, &[0x20, mode as u8]),
             Command::ColumnAddress(start, end) => Self::send_commands(iface, &[0x21, start, end]),
-            Command::PageAddress(start, end) => {
-                Self::send_commands(iface, &[0x22, start as u8, end as u8])
+            Command::PageAddress(_start, _end) => {
+                Self::send_commands(iface, &[0x22, 0, 5])
             }
             Command::PageStart(page) => Self::send_commands(iface, &[0xB0 | (page as u8)]),
             Command::StartLine(line) => Self::send_commands(iface, &[0x40 | (0x3F & line)]),
