@@ -3,12 +3,15 @@
 
 use cortex_m_rt::{entry, exception, ExceptionFrame};
 use embedded_graphics::{
-    image::{Image, ImageRaw},
-    pixelcolor::BinaryColor,
     prelude::*,
+    pixelcolor::BinaryColor,
+    primitives::{Circle, Rectangle, Triangle, PrimitiveStyleBuilder},
+    image::{Image, ImageRaw},
 };
 use panic_halt as _;
-use ssd1306::{prelude::*, I2CDisplayInterface, Ssd1306, command::Command};
+use ssd1306::{prelude::*, Ssd1306,I2CDisplayInterface, size::DisplaySize64x48, command::Command};
+use ssd1306::mode::BufferedGraphicsMode;
+
 use stm32f1xx_hal::{
     timer::Timer,
     i2c::{BlockingI2c, DutyCycle, Mode},
@@ -18,6 +21,10 @@ use stm32f1xx_hal::{
 use nb::block;
 
 mod rust_logo;
+
+const WIDTH: u8 = 64;
+const HEIGHT: u8 = 48;
+type SparkFunDisplay<DI> = Ssd1306<DI, DisplaySize64x48, BufferedGraphicsMode<DisplaySize64x48>>;
 
 #[entry]
 fn main() -> ! {
@@ -82,6 +89,14 @@ fn main() -> ! {
 
     // display.flush().unwrap();
 
+    use embedded_graphics::{prelude::*, primitives::Rectangle};
+
+    let rect = Rectangle::new(Point::new(10, 20), Size::new(3, 4));
+
+    assert_eq!(rect.columns(), 10..13);
+
+    simple_example(&mut display);
+
     loop {
 
         block!(timer.wait()).unwrap();
@@ -89,6 +104,51 @@ fn main() -> ! {
         block!(timer.wait()).unwrap();
         led.set_low();
     }
+}
+
+fn simple_example<DI>( display: &mut SparkFunDisplay<DI>) 
+where
+    DI: WriteOnlyDataCommand
+{
+
+    let yoffset = 4;
+
+    let style = PrimitiveStyleBuilder::new()
+        .stroke_width(1)
+        .stroke_color(BinaryColor::On)
+        .build();
+
+    // screen outline
+    // default display size is 128x64 if you don't pass a _DisplaySize_
+    // enum to the _Builder_ struct
+    Rectangle::new(Point::new(8, 8), Size::new( 4u32,  10u32))
+        .into_styled(style)
+        .draw(display)
+        .unwrap();
+
+    // // triangle
+    // Triangle::new(
+    //     Point::new(16, 16 + yoffset),
+    //     Point::new(16 + 16, 16 + yoffset),
+    //     Point::new(16 + 8, yoffset),
+    // )
+    // .into_styled(style)
+    // .draw(display)
+    // .unwrap();
+
+    // // square
+    // Rectangle::new(Point::new(1, yoffset), Size::new_equal(16))
+    //     .into_styled(style)
+    //     .draw(display)
+    //     .unwrap();
+
+    // // circle
+    // Circle::new(Point::new(10, yoffset), 16)
+    //     .into_styled(style)
+    //     .draw(display)
+    //     .unwrap();
+
+    display.flush().unwrap();
 }
 
 #[exception]

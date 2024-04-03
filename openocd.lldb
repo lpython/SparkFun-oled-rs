@@ -1,0 +1,22 @@
+# gdb                                    lldb
+# -------------------------------------------------------------------
+# target remote :3333                    gdb-remote 3333
+# set print asm-demangle on              (no direct equivalent, but you can use 'disassemble -m' for a similar effect)
+# set print pretty on                    type format add --format hex --count 16 --cascade false ".*"
+# # monitor tpiu config internal         (no direct equivalent, these are OpenOCD commands, not GDB/LLDB commands)
+# # monitor itm port 0 on                (no direct equivalent, these are OpenOCD commands, not GDB/LLDB commands)
+# load                                   target modules load --file ./target/thumbv7em-none-eabi/release/sparkfun-oled
+# break DefaultHandler                   breakpoint set --name DefaultHandler
+# break HardFault                        breakpoint set --name HardFault
+# break main                             breakpoint set --name main
+# continue                               process continue
+
+gdb-remote 3333
+
+type format add --format hex --count 16 --cascade false ".*"
+
+breakpoint set --name DefaultHandler
+breakpoint set --name HardFault
+breakpoint set --name main
+process continue
+

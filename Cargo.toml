@@ -23,6 +23,7 @@ version = "0.10"
 features = ["rt", "stm32f103", "medium"] # replace the model of your microcontroller here
 
 [profile.release]
-codegen-units = 1 # better optimizations
+# codegen-units = 1 # better optimizations
 debug = true # symbols are nice and they don't increase the size on Flash
-lto = true # better optimizations
+# lto = true # better optimizations
+opt-level = 0
