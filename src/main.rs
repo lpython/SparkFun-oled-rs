@@ -1,24 +1,9 @@
 #![no_std]
 #![no_main]
 
-use core::cmp::min;
 use core::f32::consts::PI;
-
 use cortex_m_rt::{entry, exception, ExceptionFrame};
-use embedded_graphics::{
-    prelude::*,
-    pixelcolor::BinaryColor,
-    primitives::{Line, Circle, Rectangle, Triangle, PrimitiveStyleBuilder},
-    image::{Image, ImageRaw},
-    mono_font::{ascii::FONT_6X10, MonoTextStyleBuilder},
-    text::{Baseline, Text},
-    geometry::{Angle, AngleUnit},
-};
-
-
 use panic_halt as _;
-use ssd1306::{prelude::*, Ssd1306,I2CDisplayInterface, size::DisplaySize64x48 };
-use ssd1306::mode::BufferedGraphicsMode;
 
 use stm32f1xx_hal::{
     timer::Timer,
@@ -28,15 +13,25 @@ use stm32f1xx_hal::{
 };
 use nb::block;
 
+use ssd1306::{prelude::*, Ssd1306,I2CDisplayInterface, size::DisplaySize64x48 };
+use ssd1306::mode::BufferedGraphicsMode;
+
+use embedded_graphics::{
+    prelude::*,
+    pixelcolor::BinaryColor,
+    primitives::{Circle, Triangle, PrimitiveStyle, PrimitiveStyleBuilder},
+    mono_font::{ascii::FONT_6X10, MonoTextStyleBuilder},
+    text::{Baseline, Text},
+};
+
 use micromath::F32Ext;
 
 mod rust_logo;
 
-
 const WIDTH: u8 = 64;
 const HEIGHT: u8 = 48;
 const CENTER_X: u8 = WIDTH / 2;
-const CENTER_Y: u8 = HEIGHT / 2;   
+// const CENTER_Y: u8 = HEIGHT / 2;   
 
 const GAUGE_CENTER: (f32, f32) = (CENTER_X as f32, (HEIGHT as f32 * 0.75));
 const GAUGE_WIDTH: f32 = 3.0;
@@ -50,7 +45,7 @@ fn main() -> ! {
     let dp = stm32::Peripherals::take().unwrap();
 
     let mut flash = dp.FLASH.constrain();
-    let mut rcc = dp.RCC.constrain();
+    let rcc = dp.RCC.constrain();
 
     let clocks = rcc.cfgr.freeze(&mut flash.acr);
 
@@ -83,7 +78,6 @@ fn main() -> ! {
     let mut timer = Timer::syst(cp.SYST, &clocks).counter_hz();
     timer.start(6.Hz()).unwrap();
 
-
     let interface = I2CDisplayInterface::new_alternate_address(i2c);
     let mut display = Ssd1306::new(interface, DisplaySize64x48, DisplayRotation::Rotate0)
         .into_buffered_graphics_mode();
@@ -94,92 +88,33 @@ fn main() -> ! {
     // display.set_column(0).unwrap();
     // display.set_row(0).unwrap();
     display.draw(rust_logo::IMAGE).unwrap();
-    // display.set_column_2(0).unwrap();
-    // display.set_row(0).unwrap();    
-    // display.bounded_draw(rust_logo::IMAGE, 64, (0,0), (64, 48)).unwrap();
-
-
-    write_text(&mut display);
-
 
     display.flush().unwrap();
 
-
-//     Servo servo0;
-    // Servo servo1;
-
-    // // Define Motor Outputs on PCA9685 board
-    // int motor0 = PB0;
-    // int motor1 = PB1;
-
-    // // Circle of the needle gauge
-    // float radius = 5.0;
-
-
-    // float lineWidth;   // used to size needle gauge to screen
-
-    // // Define Potentiometer Inputs
-    // int control0 = A1;
-    // int control1 = A4;
-
-    // typedef struct {
-    //   int pos_1;
-    //   int pos_2;
-    // } Positions_t;
 
     loop {
         for deg in 0..180 { 
             display.clear(BinaryColor::Off).unwrap();
 
-            simple_example(&mut display);
             draw_dial(&mut display, deg as f32).unwrap();
             draw_dial_center(&mut display).unwrap();
 
             display.flush().unwrap();
 
             block!(timer.wait()).unwrap();
-            // led.toggle();
+            led.toggle();
         }
         for deg in 180..0 { 
             display.clear(BinaryColor::Off).unwrap();
 
-            simple_example(&mut display);
             draw_dial(&mut display, deg as f32).unwrap();
             draw_dial_center(&mut display).unwrap();
             display.flush().unwrap();
 
             block!(timer.wait()).unwrap();
-            // led.toggle();
+            led.toggle();
         }
     }
-}
-
-fn simple_example<DI>( display: &mut SparkFunDisplay<DI>) 
-where
-    DI: WriteOnlyDataCommand
-{
-    let yoffset = 4;
-
-    let style = PrimitiveStyleBuilder::new()
-        .stroke_width(1)
-        .stroke_color(BinaryColor::On)
-        .build();
-
-    let filled = PrimitiveStyleBuilder::new()
-        .fill_color(BinaryColor::On)
-        .build();
-    
-    // Rectangle::new(Point::new(0, 0), Size::new( (HEIGHT-1) as u32,  (HEIGHT-1) as u32))
-    //     .into_styled(style)
-    //     .draw(display)
-    //     .unwrap();
-
-    // circle
-    // Circle::with_center(Point::new(CENTER_X as i32,  CENTER_Y as i32), (min(WIDTH, HEIGHT)-3) as u32)
-    //     .into_styled(style)
-    //     .draw(display)
-    //     .unwrap();
-
 }
 
 fn write_text<DI>( display: &mut SparkFunDisplay<DI>) 
@@ -208,34 +143,24 @@ where
 
     let line_end_x = LINE_LENGTH * (deg * PI / 180.0).cos();
     let line_end_y = LINE_LENGTH * (deg * PI / 180.0).sin();
+    let end = Point::new( (GAUGE_CENTER.0 + line_end_x) as i32, (GAUGE_CENTER.1 + line_end_y) as i32);
 
     let offset_deg = normalize_deg(deg + 90.0);
     let offset_x = (offset_deg * PI/180.0).cos() * GAUGE_WIDTH;
     let offset_y = (offset_deg * PI/180.0).sin() * GAUGE_WIDTH;
-
-    let style = PrimitiveStyleBuilder::new()
-        .stroke_width(1)
-        .stroke_color(BinaryColor::On)
-        .build();
-
-    // oled.line(
-    //     gauge_center_x + offset_x, gauge_center_y + offset_y, gauge_center_x + line_end_x, gauge_center_y + line_end_y);
-    
-    let end = Point::new( (GAUGE_CENTER.0 + line_end_x) as i32, (GAUGE_CENTER.1 + line_end_y) as i32);
     let left = Point::new( (GAUGE_CENTER.0 + offset_x) as i32, (GAUGE_CENTER.1 + offset_y) as i32);
-    
-    Line::new(end, left)
-        .into_styled(style)
-        .draw(target)?;
-
 
     let offset_deg = normalize_deg(deg - 90.0);
     let offset_x = (offset_deg * PI/180.0).cos() * GAUGE_WIDTH;
     let offset_y = (offset_deg * PI/180.0).sin() * GAUGE_WIDTH;
     let right = Point::new( (GAUGE_CENTER.0 + offset_x) as i32, (GAUGE_CENTER.1 + offset_y) as i32);
 
-    Line::new(end, right)
-        .into_styled(style)
+    Triangle::new(
+        end,
+        left, 
+        right
+    )
+        .into_styled(PrimitiveStyle::with_fill(BinaryColor::On))
         .draw(target)?;
     
     Ok(())
@@ -246,8 +171,9 @@ where
     D: DrawTarget<Color = BinaryColor>,
 {
     let style = PrimitiveStyleBuilder::new()
-        .stroke_width(1)
+        .fill_color(BinaryColor::Off)
         .stroke_color(BinaryColor::On)
+        .stroke_width(1)
         .build();
 
     Circle::with_center(Point::new(GAUGE_CENTER.0 as i32, GAUGE_CENTER.1 as i32), (LINE_LENGTH / 2.0) as u32)
