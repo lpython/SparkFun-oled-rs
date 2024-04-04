@@ -13,8 +13,8 @@ panic-halt = "0.2.0"
 embedded-hal = "1.0.0"
 nb = "1"
 ssd1306 = { path = "./aux/ssd1306" }
-embedded-graphics = "0.8.1"
-
+embedded-graphics = { version = "0.8.1", features = ["fixed_point"] }
+micromath = "2.1.0"
 # switch-hal = "0.4.0"
 # m = "0.1.1"
 
@@ -23,7 +23,7 @@ version = "0.10"
 features = ["rt", "stm32f103", "medium"] # replace the model of your microcontroller here
 
 [profile.release]
-# codegen-units = 1 # better optimizations
+codegen-units = 1 # better optimizations
 debug = true # symbols are nice and they don't increase the size on Flash
-# lto = true # better optimizations
-opt-level = 0
+lto = true # better optimizations
+# opt-level = 0
