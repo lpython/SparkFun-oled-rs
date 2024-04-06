@@ -26,7 +26,7 @@ use embedded_graphics::{
 
 use micromath::F32Ext;
 
-mod rust_logo;
+mod sparkfun_logo;
 
 const WIDTH: u8 = 64;
 const HEIGHT: u8 = 48;
